@@ -72,7 +72,6 @@ classdef neural_network
                     obj.activations(neuron_i, matrix_i) = Sigmoid(z);
                 end
             end
-            obj.output = obj.activations(1, 3);
         end
 
         function obj = BackPropagation(obj, cases)
@@ -80,8 +79,8 @@ classdef neural_network
             % expected is a value of the expected output (XOR gate)
             % input = [1, 1];
             % expected = 0;
-            n_iterations = 1e4;
-            learning_rate = 0.1;
+            n_iterations = 1e5;
+            learning_rate = 0.01;
             o = 3;
             h2 = 2;
             h1 = 1;
@@ -93,56 +92,65 @@ classdef neural_network
                 av_h1_w_costs   = zeros(3, 3);
                 % Forward propagation
                 
-                for case_i = 1:size(cases, 1)
-                    inputs   = cases(case_i, 1:2);
-                    expected = cases(case_i, 3);
-                    obj      = obj.ForwardPropagation(inputs);
-                    error    = obj.output - expected;
-                    error_2  = error^2;
+                % for case_i = 1:size(cases, 1)
+                %     inputs   = cases(case_i, 1:2);
+                %     expected = cases(case_i, 3);
+                %     obj      = obj.ForwardPropagation(inputs);
+                %     error    = obj.activations(1, o) - expected;
+                %     error_2  = error^2;
                     
 
 
-                    % Backward propagation
-                    % h2 activations x sigmoid prime of z_out x 2error
-                    out_w_costs = obj.activations( : , h2) .* SigmoidPrime(obj.zs(1,o))  * (2*error);
-                    delta_o     = obj.weights(:, 1, o)     .* SigmoidPrime(obj.zs(1,o))  * (2*error);
+                %     % Backward propagation
+                %     % h2 activations x sigmoid prime of z_out x 2error
+                %     out_w_costs = obj.activations( : , h2) .* SigmoidPrime(obj.zs(1,o))  * (2*error);
+                %     delta_o     = obj.weights(:, 1, o)     .* SigmoidPrime(obj.zs(1,o))  * (2*error);
                     
-                    h2_w_costs  = obj.activations(1:2, h1) * SigmoidPrime(obj.zs(:,2))' .* delta_o';
-                    delta_h2    = obj.weights(1:2, : , h2) * (SigmoidPrime(obj.zs(:,h2)) .* delta_o);
+                %     h2_w_costs  = obj.activations(1:2, h1) * SigmoidPrime(obj.zs(:,2))' .* delta_o';
+                %     delta_h2    = obj.weights(1:2, : , h2) * (SigmoidPrime(obj.zs(:,h2)) .* delta_o);
 
-                    h1_w_costs  = inputs' * SigmoidPrime(obj.zs(1:2,h1))' .* delta_h2';
+                %     h1_w_costs  = inputs' * SigmoidPrime(obj.zs(1:2,h1))' .* delta_h2';
 
+                %     av_out_w_costs(: ,   1) = av_out_w_costs( : ,   1) + out_w_costs;
+                %     av_h2_w_costs(1:2,  : ) = av_h2_w_costs( 1:2,  : ) + h2_w_costs;
+                %     av_h1_w_costs(1:2, 1:2) = av_h1_w_costs(1:2, 1:2)  + h1_w_costs;
+                %     % pause
 
-                    out_w_costs
-                    h2_w_costs
-                    h1_w_costs
-                    pause
+                % end
 
-                    av_out_w_costs
-                    av_h2_w_costs
-                    av_h1_w_costs
-                    pause
+                inputs   = cases(2, 1:2);
+                expected = cases(2, 3);
+                obj      = obj.ForwardPropagation(inputs);
 
-                    av_out_w_costs(: ,   1) = av_out_w_costs( : ,   1) + out_w_costs
-                    av_h2_w_costs(1:2,  : ) = av_h2_w_costs( 1:2,  : ) + h2_w_costs
-                    av_h1_w_costs(1:2, 1:2) = av_h1_w_costs(1:2, 1:2)  + h1_w_costs
-                    pause
-
-                end
-
-                av_out_w_costs = av_out_w_costs / 4;
-                av_h2_w_costs  = av_h2_w_costs  / 4;
-                av_h1_w_costs  = av_h1_w_costs  / 4;
-
-                x = av_out_w_costs(: ,   1) .* learning_rate;
-                y = av_h2_w_costs(1:2,  : ) .* learning_rate;
-                z = av_h1_w_costs(1:2, 1:2) .* learning_rate;
+                error    = obj.activations(1, o) - expected;
+                error_2  = error^2;
                 
-                obj.weights( : ,   1, o)  = obj.weights( : ,   1, o)  - x;
-                obj.weights(1:2,  : , h2) = obj.weights(1:2,  : , h2) - y;
-                obj.weights(1:2, 1:2, h1) = obj.weights(1:2, 1:2, h1) - z;
-                n_iterations = n_iterations - 1;
 
+
+                % Backward propagation
+                % h2 activations x sigmoid prime of z_out x 2error
+                out_w_costs = obj.activations( : , h2) .* SigmoidPrime(obj.zs(1,o))  * (2*error);
+                delta_o     = obj.weights(:, 1, o)     .* SigmoidPrime(obj.zs(1,o))  * (2*error);
+                
+                h2_w_costs  = obj.activations(1:2, h1) * SigmoidPrime(obj.zs(:,2))' .* delta_o';
+                delta_h2    = obj.weights(1:2, : , h2) * (SigmoidPrime(obj.zs(:,h2)) .* delta_o);
+
+                h1_w_costs  = inputs' * SigmoidPrime(obj.zs(1:2,h1))' .* delta_h2';
+
+                av_out_w_costs(: ,   1) = av_out_w_costs( : ,   1) + out_w_costs;
+                av_h2_w_costs(1:2,  : ) = av_h2_w_costs( 1:2,  : ) + h2_w_costs;
+                av_h1_w_costs(1:2, 1:2) = av_h1_w_costs(1:2, 1:2)  + h1_w_costs;
+                % pause
+
+
+                % av_out_w_costs = av_out_w_costs / 1;
+                % av_h2_w_costs  = av_h2_w_costs  / 1;
+                % av_h1_w_costs  = av_h1_w_costs  / 1;
+                
+                obj.weights( : ,   1, o)  = obj.weights( : ,   1, o)  - learning_rate * av_out_w_costs( : ,   1);
+                obj.weights(1:2,  : , h2) = obj.weights(1:2,  : , h2) - learning_rate * av_h2_w_costs(1:2,  : );
+                obj.weights(1:2, 1:2, h1) = obj.weights(1:2, 1:2, h1) - learning_rate * av_h1_w_costs(1:2, 1:2);
+                n_iterations = n_iterations - 1;
             end
             
         end
