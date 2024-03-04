@@ -20,8 +20,6 @@ classdef neural_network
         % where the row index represents the neuron in the layer
         % and the column index represents the layer
         zs
-        % a value between 0 and 1
-        output
         
     end
 
@@ -38,7 +36,7 @@ classdef neural_network
             obj.szs      = [n_inputs, hid_sz(1), hid_sz(2), out_sz]; % vector de tamaños de capas
 
             obj.weights     = [];                               % matriz de pesos
-            obj.bias        = [1 1 1];              % vector de bias
+            obj.bias        = rand(1, 3);         % vector de bias
             obj.activations = zeros(max(obj.szs), obj.n_layers-1);  % matriz de activaciones
             obj.zs          = zeros(max(obj.szs), obj.n_layers-1);  % matriz de activaciones
 
@@ -90,64 +88,57 @@ classdef neural_network
                 av_out_w_costs  = zeros(3, 3);
                 av_h2_w_costs   = zeros(3, 3);
                 av_h1_w_costs   = zeros(3, 3);
-                % Forward propagation
                 
-                % for case_i = 1:size(cases, 1)
-                %     inputs   = cases(case_i, 1:2);
-                %     expected = cases(case_i, 3);
-                %     obj      = obj.ForwardPropagation(inputs);
-                %     error    = obj.activations(1, o) - expected;
-                %     error_2  = error^2;
+                % -----------------------------------------------------------------------------------------
+                for case_i = 1:4
+                    inputs   = cases(case_i, 1:2);
+                    expected = cases(case_i, 3);
+                    obj      = obj.ForwardPropagation(inputs);
+                    error    = obj.activations(1, o) - expected;
+                    error_2  = error^2;
                     
-
-
-                %     % Backward propagation
-                %     % h2 activations x sigmoid prime of z_out x 2error
-                %     out_w_costs = obj.activations( : , h2) .* SigmoidPrime(obj.zs(1,o))  * (2*error);
-                %     delta_o     = obj.weights(:, 1, o)     .* SigmoidPrime(obj.zs(1,o))  * (2*error);
+                    out_w_costs = obj.activations( : , h2) .* SigmoidPrime(obj.zs(1,o))  * (2*error);
+                    delta_o     = obj.weights(:, 1, o)     .* SigmoidPrime(obj.zs(1,o))  * (2*error);
                     
-                %     h2_w_costs  = obj.activations(1:2, h1) * SigmoidPrime(obj.zs(:,2))' .* delta_o';
-                %     delta_h2    = obj.weights(1:2, : , h2) * (SigmoidPrime(obj.zs(:,h2)) .* delta_o);
+                    h2_w_costs  = obj.activations(1:2, h1) * SigmoidPrime(obj.zs(:,2))' .* delta_o';
+                    delta_h2    = obj.weights(1:2, : , h2) * (SigmoidPrime(obj.zs(:,h2)) .* delta_o);
 
-                %     h1_w_costs  = inputs' * SigmoidPrime(obj.zs(1:2,h1))' .* delta_h2';
+                    h1_w_costs  = inputs' * SigmoidPrime(obj.zs(1:2,h1))' .* delta_h2';
 
-                %     av_out_w_costs(: ,   1) = av_out_w_costs( : ,   1) + out_w_costs;
-                %     av_h2_w_costs(1:2,  : ) = av_h2_w_costs( 1:2,  : ) + h2_w_costs;
-                %     av_h1_w_costs(1:2, 1:2) = av_h1_w_costs(1:2, 1:2)  + h1_w_costs;
-                %     % pause
+                    av_out_w_costs(: ,   1) = av_out_w_costs( : ,   1) + out_w_costs;
+                    av_h2_w_costs(1:2,  : ) = av_h2_w_costs( 1:2,  : ) + h2_w_costs;
+                    av_h1_w_costs(1:2, 1:2) = av_h1_w_costs(1:2, 1:2)  + h1_w_costs;
 
-                % end
-
-                inputs   = cases(2, 1:2);
-                expected = cases(2, 3);
-                obj      = obj.ForwardPropagation(inputs);
-
-                error    = obj.activations(1, o) - expected;
-                error_2  = error^2;
+                end
+                av_out_w_costs = av_out_w_costs ./ 4;
+                av_h2_w_costs  = av_h2_w_costs  ./ 4;
+                av_h1_w_costs  = av_h1_w_costs  ./ 4;
                 
+                % -----------------------------------------------------------------------------------------
 
+                % case_i   = 1;
+                % inputs   = cases(case_i, 1:2);
+                % expected = cases(case_i, 3);
+                % obj      = obj.ForwardPropagation(inputs);
 
-                % Backward propagation
-                % h2 activations x sigmoid prime of z_out x 2error
-                out_w_costs = obj.activations( : , h2) .* SigmoidPrime(obj.zs(1,o))  * (2*error);
-                delta_o     = obj.weights(:, 1, o)     .* SigmoidPrime(obj.zs(1,o))  * (2*error);
+                % error    = obj.activations(1, o) - expected;
+                % error_2  = error^2;
+
+                % out_w_costs = obj.activations( : , h2) .* SigmoidPrime(obj.zs(1,o))  * (2*error);
+                % delta_o     = obj.weights(:, 1, o)     .* SigmoidPrime(obj.zs(1,o))  * (2*error);
                 
-                h2_w_costs  = obj.activations(1:2, h1) * SigmoidPrime(obj.zs(:,2))' .* delta_o';
-                delta_h2    = obj.weights(1:2, : , h2) * (SigmoidPrime(obj.zs(:,h2)) .* delta_o);
+                % h2_w_costs  = obj.activations(1:2, h1) * SigmoidPrime(obj.zs(:,2))' .* delta_o';
+                % delta_h2    = obj.weights(1:2, : , h2) * (SigmoidPrime(obj.zs(:,h2)) .* delta_o);
 
-                h1_w_costs  = inputs' * SigmoidPrime(obj.zs(1:2,h1))' .* delta_h2';
+                % h1_w_costs  = inputs' * SigmoidPrime(obj.zs(1:2,h1))' .* delta_h2';
 
-                av_out_w_costs(: ,   1) = av_out_w_costs( : ,   1) + out_w_costs;
-                av_h2_w_costs(1:2,  : ) = av_h2_w_costs( 1:2,  : ) + h2_w_costs;
-                av_h1_w_costs(1:2, 1:2) = av_h1_w_costs(1:2, 1:2)  + h1_w_costs;
-                % pause
-
-
-                % av_out_w_costs = av_out_w_costs / 1;
-                % av_h2_w_costs  = av_h2_w_costs  / 1;
-                % av_h1_w_costs  = av_h1_w_costs  / 1;
+                % av_out_w_costs(: ,   1) = av_out_w_costs( : ,   1) + out_w_costs;
+                % av_h2_w_costs(1:2,  : ) = av_h2_w_costs( 1:2,  : ) + h2_w_costs;
+                % av_h1_w_costs(1:2, 1:2) = av_h1_w_costs(1:2, 1:2)  + h1_w_costs;
                 
-                obj.weights( : ,   1, o)  = obj.weights( : ,   1, o)  - learning_rate * av_out_w_costs( : ,   1);
+                % -----------------------------------------------------------------------------------------
+
+                obj.weights( : ,   1, o)  = obj.weights( : ,   1, o)  - learning_rate * av_out_w_costs( : ,  1);
                 obj.weights(1:2,  : , h2) = obj.weights(1:2,  : , h2) - learning_rate * av_h2_w_costs(1:2,  : );
                 obj.weights(1:2, 1:2, h1) = obj.weights(1:2, 1:2, h1) - learning_rate * av_h1_w_costs(1:2, 1:2);
                 n_iterations = n_iterations - 1;
