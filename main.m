@@ -4,10 +4,10 @@ cases = [ % XOR
         1e-5 1    1;
         1e-5 1e-5 1e-5
     ];
-rng(69); 
 
+i = input("case no:");
 nn = neural_network();  
-nn = nn.BackPropagation(cases);
+nn = nn.BackPropagation(cases(i, :));
 
-prediction = nn.Predict(cases(1,1:2));
+prediction = nn.Predict(cases(i, 1:2));
 disp(prediction);

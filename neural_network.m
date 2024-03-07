@@ -124,10 +124,10 @@ classdef neural_network
                 error    = obj.activations(1, o) - expected;
                 error_2  = error^2;
 
-                out_w_costs = obj.activations( : , h2) .* SigmoidPrime(obj.zs(1,o))  * (2*error);
-                delta_o     = obj.weights(:, 1, o)     .* SigmoidPrime(obj.zs(1,o))  * (2*error);
+                out_w_costs = obj.activations( : , h2) .* SigmoidPrime(obj.zs(1,o))  * (error);
+                delta_o     = obj.weights(:, 1, o)     .* SigmoidPrime(obj.zs(1,o))  * (error);
                 
-                h2_w_costs  = obj.activations(1:2, h1) * SigmoidPrime(obj.zs(:,2))' .* delta_o';
+                h2_w_costs  = obj.activations(1:2, h1) * SigmoidPrime(obj.zs(:,2))'  .* delta_o';
                 delta_h2    = obj.weights(1:2, : , h2) * (SigmoidPrime(obj.zs(:,h2)) .* delta_o);
 
                 h1_w_costs  = inputs' * SigmoidPrime(obj.zs(1:2,h1))' .* delta_h2';
