@@ -58,41 +58,48 @@ classdef neural_network
         end
 
         function obj = BackPropagation(obj, cases)
-            n_iterations = 1e5;
-            learning_rate = 0.005;
+            n_iterations = 1e6;
+            learning_rate = 1;
             error_2  = zeros(1, n_iterations);
             counter  = 1;
-            inputs   = cases(1:2);
-            expected = cases(3);
 
             while counter <= n_iterations
-                
-                % Forward Propagation
-                % -----------------------------------------------------------------------------------------
-                obj   = obj.ForwardPropagation(inputs);
-                error = obj.a_o - expected;
-                error_2(1, counter) = error^2 / 2;
+                out_w_costs = zeros(1, 3);
+                h2_w_costs  = zeros(2, 3);
+                h1_w_costs  = zeros(2, 2);
 
-                % Gradient Descent
-                % -----------------------------------------------------------------------------------------
+                for i = 1:4
+                    inputs   = cases(i, 1:2);
+                    expected = cases(i, 3);
 
-                % Activation * SigmoidPrime * Error
-                out_w_costs = obj.a_h2 .* SigmoidPrime(obj.z_o) .* (error);
-                delta_o     = obj.w_o  .* SigmoidPrime(obj.z_o) * (error);
+                    % Forward Propagation
+                    % -----------------------------------------------------------------------------------------
+                    obj   = obj.ForwardPropagation(inputs);
+                    error = obj.a_o - expected;
+                    error_2(1, counter) = error_2(1, counter) + error^2 / 2;
 
-                % Activation * SigmoidPrime * Sum(phi_o * w_o)
-                h2_w_costs  = obj.a_h1' * SigmoidPrime(obj.z_h2) .* delta_o';
-                delta_h2    = obj.w_h2  * (SigmoidPrime(obj.z_h2) .* delta_o')';
-
-                % Activation * SigmoidPrime * Sum(phi_h2 * w_h2)
-                h1_w_costs  = inputs' * SigmoidPrime(obj.z_h1) .* delta_h2';
+                    % Gradient Descent
+                    % -----------------------------------------------------------------------------------------
+    
+                    % Activation * SigmoidPrime * Error
+                    out_w_costs = out_w_costs + (obj.a_h2 .* SigmoidPrime(obj.z_o) .* (error));
+                    delta_o     = obj.w_o  .* SigmoidPrime(obj.z_o) * (error);
+    
+                    % Activation * SigmoidPrime * Sum(phi_o * w_o)
+                    h2_w_costs  = h2_w_costs + (obj.a_h1' * SigmoidPrime(obj.z_h2) .* delta_o');
+                    delta_h2    = obj.w_h2  * (SigmoidPrime(obj.z_h2) .* delta_o')';
+    
+                    % Activation * SigmoidPrime * Sum(phi_h2 * w_h2)
+                    h1_w_costs  = h1_w_costs + (inputs' * SigmoidPrime(obj.z_h1) .* delta_h2');
+                    
+                end
                 
                 % Update weights
                 % -----------------------------------------------------------------------------------------
                 obj.w_o(:, :)  = obj.w_o( :, :) - learning_rate .* out_w_costs';
                 obj.w_h2(:, :) = obj.w_h2(:, :) - learning_rate .* h2_w_costs;
                 obj.w_h1(:, :) = obj.w_h1(:, :) - learning_rate .* h1_w_costs';
-
+                error_2(1, counter) = error_2(1, counter) / 4;
                 counter = counter + 1;
             end
             % Plot error
