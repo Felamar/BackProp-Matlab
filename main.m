@@ -7,7 +7,7 @@ cases = [      % XOR
         0 1 1; % Case 3
         0 0 0  % Case 4
     ];
-rng(2) % seed for random number generator for reproducibility
+rng(69) % seed for random number generator for reproducibility
 nn = neural_network();  
 fprintf('\nTraining the neural network...\n');
 nn = nn.BackPropagation(cases);
